@@ -1,0 +1,53 @@
+html, body, #app, #app>div, #__next {
+  height: 100%;
+  font-size: small;
+}
+
+textarea:focus, input:focus {
+  outline: none
+}
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  border: 1px solid white;
+  border-radius: 3px;
+  background-color: rgba(81, 121, 131, 0.5);
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.profile {
+  text-align: left;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  max-width: 20rem;
+}
+
+.toast {
+  margin: 0;
+  padding: 0 1rem;
+  background-color: rgba(255, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+.row {
+  font-family: monospace;
+}
+
+.row button {
+  font-family: monospace;
+  height: 2rem;
+  width: 2rem;
+  padding: 0;
+}
+
+

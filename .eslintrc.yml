@@ -1,0 +1,66 @@
+env:
+  node              : true
+  browser           : true
+  es2021            : true
+
+extends:
+  - eslint:recommended
+  - plugin:react/recommended
+  - plugin:react/jsx-runtime
+  - standard-with-typescript
+
+overrides           : []
+
+parserOptions:
+  ecmaVersion       : latest
+  ecmaFeatures:
+    jsx: true
+  sourceType        : module
+  project:
+   - tsconfig.json
+
+rules:
+  semi               : [ 2, never ]
+  one-var            : off
+  return-await       : off
+  indent             : off
+  no-multi-spaces    : off
+  operator-linebreak : off
+  array-bracket-spacing:
+    - error
+    - always
+  key-spacing:
+    - error
+    - multiLine:
+        beforeColon : false
+        afterColon  : true
+      align:
+        beforeColon : true
+        afterColon  : true
+  "@typescript-eslint/indent": off
+  "@typescript-eslint/return-await": [ 1, "in-try-catch" ]
+  "@typescript-eslint/no-base-to-string": off
+  "@typescript-eslint/naming-convention": off
+  "@typescript-eslint/explicit-function-return-type": off
+  "@typescript-eslint/no-unused-vars":
+    - "error"
+    - varsIgnorePattern: "^_"
+  "@typescript-eslint/no-invalid-void-type":
+    - "error"
+    - allowInGenericTypeArguments: true
+  "@typescript-eslint/type-annotation-spacing":
+    - "error"
+    - before        : true
+      after         : true
+      overrides:
+        arrow:
+          before    : true
+          after     : true
+
+settings:
+  react:
+    version: detect
+
+ignorePatterns:
+  - dist
+  - test
