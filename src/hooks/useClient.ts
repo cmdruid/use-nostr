@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { StoreAPI }  from './useStore.js'
 import { NostrStore } from '../schema/types.js'
-import { Event as SignedEvent, Filter, SimplePool } from 'nostr-tools'
+import { Event, EventTemplate, Filter, SimplePool } from 'nostr-tools'
+import { publishEvent } from '../lib/signer.js'
 
 export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
-  const { pubkey, relays } = store
+  const { pubkey, relays, signer } = store
   const pool = new SimplePool()
 
   useEffect(() => {
@@ -39,12 +40,26 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     })
   }
 
+  async function publish (event : EventTemplate) {
+    if (signer === undefined) {
+      setError('Signer is not defined!')
+      return undefined
+    }
+
+    return publishEvent(client, event, signer)
+      .catch(err => {
+        setError(err as Error)
+        return undefined
+      })
+  }
+
   const client = {
     connected,
-    get  : async (filter  : Filter)      => pool.get(relays, filter),
-    list : async (filters : Filter[])    => pool.list(relays, filters),
-    pub  : async (event   : SignedEvent) => pool.publish(relays, event),
-    sub  : async (filters : Filter[])    => pool.sub(relays, filters)
+    publish,
+    get  : async (filter  : Filter)   => pool.get(relays, filter),
+    list : async (filters : Filter[]) => pool.list(relays, filters),
+    pub  : async (event   : Event)    => pool.publish(relays, event),
+    sub  : async (filters : Filter[]) => pool.sub(relays, filters)
   }
 
   return { client }

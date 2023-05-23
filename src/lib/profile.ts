@@ -33,7 +33,7 @@ export async function setProfileEvent (
   client  : Client,
   profile : Profile,
   signer  : Signer
-) : Promise<Profile> {
+) : Promise<Profile | undefined> {
   const template = {
     tags       : [],
     content    : JSON.stringify(profile),

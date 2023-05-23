@@ -42,21 +42,14 @@ export async function publishEvent (
 
   let timer : NodeJS.Timeout
 
-  function resolver (status : string) {
+  function resolver () {
     clearTimeout(timer)
-    switch (status) {
-      case 'ok':
-        return signed
-      case 'timeout':
-        throw new Error('Event publishing timed out!')
-      default:
-        throw new Error('Failed to publish event.')
-    }
+    return signed
   }
 
-  return new Promise(resolve => {
-    timer = setTimeout(() => { resolve(resolver('timeout')) }, 5000)
-    pub.on('ok',       () => { resolve(resolver('ok'))  })
-    pub.on('failed',   () => { resolve(resolver('failed')) })
+  return new Promise((resolve, reject) => {
+    pub.on('ok',       () => { resolve(resolver())  })
+    pub.on('failed',   () => { reject(new Error('Failed to publish event.')) })
+    timer = setTimeout(() => { reject(new Error('Event publishing timed out!')) }, 5000)
   })
 }
