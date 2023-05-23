@@ -1,6 +1,6 @@
-import { UnsignedEvent } from 'nostr-tools'
+import { Event, EventTemplate, Filter, Pub, Sub } from 'nostr-tools'
 
-export type Signer = (event : UnsignedEvent) => Promise<string>
+export type Signer = (event : EventTemplate) => Promise<Event>
 
 declare global {
   interface Window {
@@ -11,14 +11,25 @@ declare global {
   }
 }
 
-export interface Event<T = string> {
-  kind       : number
-  created_at : number
-  pubkey     : string
-  id         : string
-  sig        : string
-  content    : T
-  tags       : string[][]
+export interface Client {
+  connected : () => Promise<boolean>
+  get  : (filter  : Filter)   => Promise<Event | null>
+  list : (filters : Filter[]) => Promise<Event[]>
+  pub  : (event   : Event)    => Promise<Pub>
+  sub  : (filters : Filter[]) => Promise<Sub>
+}
+
+export interface NostrStore {
+  client      ?: Client
+  connection   : 'none' | 'conn' | 'ok' | 'error'
+  hasExtension : boolean
+  isConnected  : boolean
+  isLoading    : boolean
+  error       ?: string
+  pubkey      ?: string
+  profile     ?: Profile
+  relays       : string[]
+  signer      ?: Signer
 }
 
 export interface Profile {
@@ -33,5 +44,3 @@ export interface Profile {
   lud16        ?: string | undefined
   nip05        ?: string | undefined
 }
-
-export type ProfileEvent = Event<Profile>

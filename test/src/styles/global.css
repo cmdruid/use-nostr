@@ -20,6 +20,7 @@ textarea:focus, input:focus {
   background-color: rgba(81, 121, 131, 0.5);
   padding: 1rem;
   margin: 1rem;
+  min-width: 200px;
 }
 
 .profile {
@@ -29,7 +30,8 @@ textarea:focus, input:focus {
 .card {
   display: flex;
   flex-direction: column;
-  max-width: 20rem;
+  /* max-width: 20rem; */
+  /* width: 100%; */
 }
 
 .toast {
@@ -48,6 +50,11 @@ textarea:focus, input:focus {
   height: 2rem;
   width: 2rem;
   padding: 0;
+}
+
+.events textarea {
+  border: 1px solid white;
+  font-family: monospace;
 }
 
 

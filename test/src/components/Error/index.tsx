@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
-import { useNostrProfile } from '../../../../src/index.js'
+import { useNostr } from '../../../../src/index.js'
 
 export default function Toast () {
-  const { store, update } = useNostrProfile()
+  const { store, update } = useNostr()
 
   useEffect(() => {
     if (typeof store.error === 'string') {
-      setTimeout(() => update('error', undefined), 5000)
+      setTimeout(() => update({ error : undefined }), 5000)
     }
   }, [ store.error ])
 

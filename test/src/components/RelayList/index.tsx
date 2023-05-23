@@ -1,9 +1,9 @@
 import { ReactElement, useState } from 'react'
-import { useNostrProfile } from '../../../../src/index.js'
+import { useNostr } from '../../../../src/index.js'
 
 export default function RelayList () : ReactElement {
   const [ relay, setRelay ] = useState('')
-  const { store, update } = useNostrProfile()
+  const { store, update } = useNostr()
 
   function addRelay () {
     if (
@@ -11,14 +11,14 @@ export default function RelayList () : ReactElement {
       !store.relays.includes(relay)
     ) {
       const relays = [ ...store.relays, relay ]
-      update('relays', relays)
+      update({ relays })
     }
     setRelay('')
   }
 
   function remRelay (url : string) {
     const relays = store.relays.filter(e => e !== url)
-    update('relays', relays)
+    update({ relays })
   }
 
   return (

@@ -1,51 +1,46 @@
-import { SimplePool } from 'nostr-tools'
-import { Event, Profile, Signer } from '../schema/types.js'
+import { publishEvent } from './signer.js'
+import { Client, Profile, Signer } from '../schema/types.js'
 
-export async function getProfile (
-  pubkey : string,
-  relays : string[]
+export async function getProfileEvent (
+  client : Client,
+  pubkey : string
 ) : Promise<Profile | undefined> {
-  const events : Event[] = []
-  const filters = [ {
+  const filter = {
     authors : [ pubkey ],
-    kinds   : [ 0 ],
-    limit   : 10
-  } ]
-
-  const pool = new SimplePool()
-  const sub  = pool.sub(relays, filters)
-
-  sub.on('event', (event) => { events.push(event) })
+    kinds   : [ 0 ]
+  }
 
   let timer : NodeJS.Timeout
 
-  function resolver () : Profile | undefined {
-    clearTimeout(timer)
-    sub.unsub()
-    events.sort((a, b) => a.created_at - b.created_at)
-    return (events[0]?.content !== undefined)
-      ? JSON.parse(events[0].content)
-      : undefined
-  }
-
-  return new Promise(resolve => {
-    timer = setTimeout(() => { resolve(resolver()) }, 5000)
-    sub.on('eose', () => { resolve(resolver()) })
+  return new Promise((resolve, reject) => {
+    // Set a timeout that rejects with an error.
+    timer = setTimeout(() => {
+      reject(new Error('Profile request timed out!'))
+    }, 5000)
+    // Fetch the profile using client and filter.
+    void client.get(filter).then(event => {
+      clearTimeout(timer)
+      resolve(
+        (event?.content !== undefined)
+          ? JSON.parse(event.content)
+          : undefined
+      )
+    })
   })
 }
 
-export async function setProfile (
+export async function setProfileEvent (
+  client  : Client,
   profile : Profile,
-  pubkey  : string,
   signer  : Signer
-) {
-  const event = {
-    pubkey,
-    content    : JSON.stringify(profile),
+) : Promise<Profile> {
+  const template = {
     tags       : [],
+    content    : JSON.stringify(profile),
     kind       : 0,
     created_at : Math.floor(Date.now() / 1000)
   }
 
-  return signer(event)
+  return publishEvent(client, template, signer)
+    .then(res => JSON.parse(res.content) as Profile)
 }
