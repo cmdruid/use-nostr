@@ -143,9 +143,9 @@ login = {
   // Login with NIP-07 extension (if available).
   withExt     : () => void,
   // Login with npub or pubkey hex (read only).
-  withPub     : (string) => void,
+  withPubKey  : (string) => void,
   // Login with nsec or seckey hex.
-  withSec     : (string) => void,
+  withSecKey  : (string) => void,
   // Generate a new (ephemeral) keypair.
   generateKey : () => void
 }
@@ -165,13 +165,13 @@ client = {
   // Publish an event from a partial JSON template.
   publish   : (event : Partial<Event>) => Promise<Event>,
   // Fetch the top event using the provided filter.
-  get  : async (filter  : Filter)      => Promise<Event>,
+  get  : (filter  : Filter)   => Promise<Event>,
   // Fetch a list of events using the provided filters.
-  list : async (filters : Filter[])    => Promise<Event[]>,
+  list : (filters : Filter[]) => Promise<Event[]>,
   // Publish a signed event and receive a Pub emitter.
-  pub  : async (event   : Event)       => Promise<Pub>,
+  pub  : (event   : Event)    => Promise<Pub>,
   // Subscribe to a list of filters and receive a Sub emitter.
-  sub  : async (filters : Filter[])    => Promise<Sub>
+  sub  : (filters : Filter[]) => Promise<Sub>
 }
 ```
 
