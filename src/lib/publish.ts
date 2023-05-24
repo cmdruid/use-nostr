@@ -1,4 +1,4 @@
-import { Event, EventTemplate } from 'nostr-tools'
+import { Event, EventTemplate, Kind } from 'nostr-tools'
 import { Client, Signer } from '../schema/types.js'
 
 export async function publishEvent (
@@ -7,7 +7,7 @@ export async function publishEvent (
   signer : Signer
 ) : Promise<Event> {
   const signed = await signer({
-    kind       : 20000,
+    kind       : 20000 as Kind,
     created_at : Math.floor(Date.now() / 1000),
     tags       : [],
     content    : '',
