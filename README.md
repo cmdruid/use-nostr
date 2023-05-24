@@ -224,7 +224,7 @@ https://github.com/nbd-wtf/nostr-tools
 ## Resources  
 
 **Nostr Implementation Possibilities**  
-This site is an index of current and draft NIPs.
+This site is an index of current and draft NIPs.  
 https://nips.be
 
 ## License
