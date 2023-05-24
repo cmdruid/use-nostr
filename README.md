@@ -23,7 +23,7 @@ To make `useNostr` available across your entire react app, wrap your root compon
 ```tsx
 // Example entrypoint for react / nextjs.
 // Your project may look slightly different.
-import { NostrProvider } from '@cmdcode/useNostr'
+import { NostrProvider } from '@cmdcode/use-nostr'
 
 export default function App ({ Component, pageProps }) {
   return (
@@ -42,7 +42,7 @@ Here is a basic example of reading and updating your relay list:
 
 ```tsx
 import { useState } from 'react'
-import { useNostr } from '@cmdcode/useNostr'
+import { useNostr } from '@cmdcode/use-nostr'
 
 export default function Relays () {
   const { store, update }   = useNostr()
@@ -67,7 +67,7 @@ Here is an example login flow that covers all methods of signing in:
 
 ```tsx
 import { useState } from 'react'
-import { useNostr } from '@cmdcode/useNostr'
+import { useNostr } from '@cmdcode/use-nostr'
 
 export default function Login () {
   const [ pubkey, setPubKey ] = useState('')
