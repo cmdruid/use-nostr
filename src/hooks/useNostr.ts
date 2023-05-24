@@ -23,7 +23,9 @@ export function useNostrStore (
   }, [ client, connection ])
 
   useEffect(() => {
-    console.log('NostrStore:', store)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('NostrStore:', store)
+    }
   }, [ store ])
 
   return {
