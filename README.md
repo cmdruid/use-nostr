@@ -1,20 +1,18 @@
-# Nostr React Hook
+# useNostr
 
 This project is designed to be a turn-key library for using Nostr with React.
 
 - Login with pubkey, npub, seckey, nsec, extension, or generate a new key.
-- Access to global client with `get`, `list`, `sub`, and `publish`.
+- Nostr client API with `get`, `list`, `sub`, and `publish`.
 - Configure a list of relays for your client to use.
 - Uses a simple reducer `store` with `update` method.
-- Includes booleans, status and errors for feedback.
-- Simple API for client, login, relay, and profile management.
-- `Provider` wrapper component is included for global context.
+- Helper boolean, status and error messages for reactive components.
 
 Coming soon:
   - Sign / verify custom messages and challenges using the Signer API.
   - Receive a Taproot HD wallet derived from your nostr signing device.
 
-This project is fully typed and should work with intellisense.
+This project is fully typed and designed to work with intellisense.
 
 More documentation coming soon!
 
@@ -69,7 +67,7 @@ Here is an example login flow that covers all methods of signing in:
 
 ```tsx
 import { useState } from 'react'
-import { useNostr } from '@cmdcode/nostr-auth'
+import { useNostr } from '@cmdcode/useNostr'
 
 export default function Login () {
   const [ pubkey, setPubKey ] = useState('')
@@ -110,12 +108,19 @@ The library is split into several modules that plug into the main store.
 ```ts
 const { store, update, reset, setError } = useNostr()
 
+// The main data store.
 store : NostrStore
+// Update the data store using a JSON object.
 update   = (store : Partial<NostrStore>) => void
+// Resets the data store. Provide an 
+// optional JSON object for defaults.
 reset    = (store : Partial<NostrStore>) => void
+// Sets an error message in the store, 
+// plus print to console.
 setError = (err : Error) => void
 
 interface NostrStore {
+  // Schema for the data store.
   client      ?: Client
   connection   : 'none' | 'conn' | 'ok' | 'error'
   hasExtension : boolean
@@ -135,13 +140,18 @@ interface NostrStore {
 const { login, logout } = useNostr()
 
 login = {
-  withExt     : () => void, 
-  withPub     : (string) => void, 
+  // Login with NIP-07 extension (if available).
+  withExt     : () => void,
+  // Login with npub or pubkey hex (read only).
+  withPub     : (string) => void,
+  // Login with nsec or seckey hex.
   withSec     : (string) => void,
+  // Generate a new (ephemeral) keypair.
   generateKey : () => void
 }
 
-logout = () => void // Removes all user data from the store.
+// Removes all user data from the store.
+logout = () => void
 ```
 
 ### Client API
@@ -150,12 +160,18 @@ logout = () => void // Removes all user data from the store.
 const { client } = useNostr()
 
 client = {
+  // Checks pool connection and returns a boolean result.
   connected : () => Promise<boolean>,
-  publish   : (event : EventTemplate) => Promise<Event>,
-  get  : async (filter  : Filter)     => Promise<Event>,
-  list : async (filters : Filter[])   => Promise<Event[]>,
-  pub  : async (event   : Event)      => Promise<Pub>,
-  sub  : async (filters : Filter[])   => Promise<Sub>
+  // Publish an event from a partial JSON template.
+  publish   : (event : Partial<Event>) => Promise<Event>,
+  // Fetch the top event using the provided filter.
+  get  : async (filter  : Filter)      => Promise<Event>,
+  // Fetch a list of events using the provided filters.
+  list : async (filters : Filter[])    => Promise<Event[]>,
+  // Publish a signed event and receive a Pub emitter.
+  pub  : async (event   : Event)       => Promise<Pub>,
+  // Subscribe to a list of filters and receive a Sub emitter.
+  sub  : async (filters : Filter[])    => Promise<Sub>
 }
 ```
 
@@ -164,7 +180,9 @@ client = {
 ```ts
 const { getProfile, setProfile } = useNostr()
 
+// Fetch your profile from the relays.
 getProfile = () => Promise<Profile | undefined>
+// Update your profile using a partial JSON template.
 setprofile = (updates : Partial<Profile>) => Promise<void>
 ```
 
@@ -179,6 +197,8 @@ This library uses `yarn` for package management and `vite` for a development / d
 ```bash
 ## Start the vite development server:
 yarn dev
+## Build a new release of the package:
+yarn release
 ```
 
 ## Bugs / Issues
@@ -195,17 +215,17 @@ This library contains minimal dependencies.
 
 **React**  
 React library for hooks and JSX.  
-https://github.com/xxx/react
+https://github.com/facebook/react
 
 **nostr-tools**  
 Nostr utility library for all nostr stuff.  
-https://github.com/xxx/nostr-tools
+https://github.com/nbd-wtf/nostr-tools
 
 ## Resources  
 
-**NIP: Nostr Implementation Possibilities**  
-This BIP covers schnorr signatures and verification.  
-https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
+**Nostr Implementation Possibilities**  
+This site is an index of current and draft NIPs.
+https://nips.be
 
 ## License
 

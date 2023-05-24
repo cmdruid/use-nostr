@@ -1,4 +1,4 @@
-import { publishEvent } from './signer.js'
+import { publishEvent } from './publish.js'
 import { Client, Profile, Signer } from '../schema/types.js'
 
 export async function getProfileEvent (

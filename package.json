@@ -1,7 +1,7 @@
 {
-  "name": "@cmdcode/react-nostr-auth",
+  "name": "@cmdcode/useNostr",
   "author": "Christopher Scott",
-  "description": "Turn-key login and profile management for Nostr and React.",
+  "description": "Turn-key library for using Nostr with React.",
   "license": "CC-BY-1.0",
   "version": "0.0.1",
   "type": "module",
@@ -12,14 +12,14 @@
   },
   "keywords": [
     "nostr",
+    "client",
     "login",
-    "auth",
     "profile",
     "react"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/cmdruid/react-nostr-auth.git"
+    "url": "https://github.com/cmdruid/useNostr.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

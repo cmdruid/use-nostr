@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
-import { StoreAPI }  from './useStore.js'
-import { NostrStore } from '../schema/types.js'
+import { useEffect }    from 'react'
+import { StoreAPI }     from './useStore.js'
+import { NostrStore }   from '../schema/types.js'
+import { publishEvent } from '../lib/publish.js'
+
 import { Event, EventTemplate, Filter, SimplePool } from 'nostr-tools'
-import { publishEvent } from '../lib/signer.js'
 
 export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
-  const { pubkey, relays, signer } = store
+  const { isConnected, pubkey, relays, signer } = store
   const pool = new SimplePool()
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
 
   async function connected () : Promise<boolean> {
     if (relays.length === 0) {
-      setError('Relay list is empty!')
+      setError('Your relay list is empty!')
       return false
     }
     return new Promise(resolve => {
@@ -40,9 +41,14 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     })
   }
 
-  async function publish (event : EventTemplate) {
+  async function publish (event : Partial<EventTemplate>) : Promise<Event | undefined> {
+    if (!isConnected) {
+      setError('Not connected to a relay!')
+      return undefined
+    }
+
     if (signer === undefined) {
-      setError('Signer is not defined!')
+      setError('Signing method is not defined!')
       return undefined
     }
 

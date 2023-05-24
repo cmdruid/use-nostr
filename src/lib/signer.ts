@@ -8,8 +8,6 @@ import {
   verifySignature
 } from 'nostr-tools'
 
-import { Client, Signer } from '../schema/types.js'
-
 export function verifyEvent (event : Event) {
   return validateEvent(event) && verifySignature(event)
 }
@@ -30,26 +28,4 @@ export function getExtSigner () {
     throw new Error('Extension does not have sign method!')
   }
   return async (event : EventTemplate) => window.nostr.signEvent(event)
-}
-
-export async function publishEvent (
-  client : Client,
-  event  : EventTemplate,
-  signer : Signer
-) : Promise<Event> {
-  const signed = await signer(event)
-  const pub    = await client.pub(signed)
-
-  let timer : NodeJS.Timeout
-
-  function resolver () {
-    clearTimeout(timer)
-    return signed
-  }
-
-  return new Promise((resolve, reject) => {
-    pub.on('ok',       () => { resolve(resolver())  })
-    pub.on('failed',   () => { reject(new Error('Failed to publish event.')) })
-    timer = setTimeout(() => { reject(new Error('Event publishing timed out!')) }, 5000)
-  })
 }
