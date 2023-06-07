@@ -9,7 +9,7 @@ import './styles/global.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <NostrProvider defaults={{ relays: [ 'relay.taxi'] }}>
+    <NostrProvider>
       <App />
     </NostrProvider>
   </React.StrictMode>

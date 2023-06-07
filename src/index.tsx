@@ -26,8 +26,10 @@ export function NostrProvider ({
 ) : ReactElement {
   // Returns the Provider that wraps our app and
   // passes down the context object.
-  const default_store = { ...DEFAULT.store, ...defaults }
-  const ctx = useNostrStore(default_store, hooks)
+  const ctx = useNostrStore(
+    { ...DEFAULT.store, ...defaults },
+    { ...DEFAULT.hooks, ...hooks    }
+  )
 
   return (
     <context.Provider value={ctx}>
