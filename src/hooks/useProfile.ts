@@ -14,7 +14,7 @@ export function useProfile (
   const { client, isConnected, pubkey, profile, signer } = store
 
   useEffect(() => {
-    // Validate pubkey, then fetch profile.
+    // Fetch profile automatically.
     if (profile === undefined && pubkey !== undefined && isConnected) {
       update({ isLoading: true })
       void getProfile()
