@@ -14,12 +14,21 @@ export type NostrContext = ReturnType<typeof useNostrStore>
 // Create our provider context.
 const context = createContext<NostrContext | null>(null)
 
-export function NostrProvider (
-  { children } : { children : ReactElement | ReactElement[] }
+export function NostrProvider ({
+  children,
+  defaults = {},
+  hooks    = {}
+} : {
+  children : ReactElement | ReactElement[]
+  defaults : Partial<typeof DEFAULT.store>
+  hooks    : Partial<typeof DEFAULT.hooks>
+}
 ) : ReactElement {
   // Returns the Provider that wraps our app and
   // passes down the context object.
-  const ctx = useNostrStore(DEFAULT.store, DEFAULT.hooks)
+  const default_store = { ...DEFAULT.store, ...defaults }
+  const ctx = useNostrStore(default_store, hooks)
+
   return (
     <context.Provider value={ctx}>
       {children}
