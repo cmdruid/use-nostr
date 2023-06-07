@@ -19,9 +19,9 @@ export function NostrProvider ({
   defaults = {},
   hooks    = {}
 } : {
-  children : ReactElement | ReactElement[]
-  defaults : Partial<typeof DEFAULT.store>
-  hooks    : Partial<typeof DEFAULT.hooks>
+  children  : ReactElement | ReactElement[]
+  defaults ?: Partial<typeof DEFAULT.store>
+  hooks    ?: Partial<typeof DEFAULT.hooks>
 }
 ) : ReactElement {
   // Returns the Provider that wraps our app and
