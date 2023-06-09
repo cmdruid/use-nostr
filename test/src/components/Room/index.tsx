@@ -6,13 +6,14 @@ export default function DemoRoom () : ReactElement {
   const [ secret, setSecret   ] = useState('usenostr-demo')
   const [ msg, setMsg ]     = useState('')
   const [ room, setRoom ]   = useState<NostrRoom | undefined>()
-  const [ chat, setChat ]   = useState<any[]>([]) 
+  const [ chat, setChat ]   = useState('')
+ 
   const { store, joinRoom } = useNostr()
 
   function join () {
     const rm = joinRoom(secret)
-    rm.on('msg', () => {
-      setChat(rm.cache)
+    rm.on('msg', (message : string) => {
+      setChat(message)
     })
     setRoom(rm)
   }
@@ -47,7 +48,7 @@ export default function DemoRoom () : ReactElement {
           }
         </div>
         <div>
-          <pre>{room !== undefined && JSON.stringify(chat, null, 2)}</pre>
+          <pre>{room !== undefined && chat}</pre>
           <input
             type="text"
             placeholder='enter a message...'
