@@ -13,6 +13,8 @@ declare global {
 
 export interface Client {
   connected : () => Promise<boolean>
+  pubkey  : string | undefined
+  publish : (tempalte : Partial<EventTemplate>) => Promise<Event | undefined>
   get  : (filter  : Filter)   => Promise<Event | null>
   list : (filters : Filter[]) => Promise<Event[]>
   pub  : (event   : Event)    => Promise<Pub>

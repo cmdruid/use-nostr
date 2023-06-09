@@ -6,6 +6,7 @@ import Events      from './components/Events/index.js'
 import Login       from './components/Login/index.js'
 import UserProfile from './components/Profile/index.js'
 import RelayList   from './components/RelayList/index.js'
+import DemoRoom    from './components/Room/index.js'
 
 export default function App () : ReactElement {
   const { store } = useNostr()
@@ -18,6 +19,7 @@ export default function App () : ReactElement {
         <>
           {!store.profile && <Login /> || <UserProfile />}
           <Events />
+          <DemoRoom />
         </>
       }
     </div>

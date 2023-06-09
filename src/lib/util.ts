@@ -1,3 +1,14 @@
+export function now () {
+  return Math.floor(Date.now() / 1000)
+}
+
+export function isExpired (
+  timestamp : number,
+  timeout   : number
+) : boolean {
+  return now() > (timestamp + timeout)
+}
+
 export async function sleep (ms = 1000) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }

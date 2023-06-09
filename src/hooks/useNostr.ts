@@ -2,7 +2,7 @@ import { useEffect }       from 'react'
 import { useLogin }        from './useLogin.js'
 import { useProfile }      from './useProfile.js'
 import { useClient }       from './useClient.js'
-// import { useSigner }       from './useSigner.js'
+import { useRoom }         from './useRoom.js'
 import { Hooks, useStore } from './useStore.js'
 import { NostrStore }      from '../schema/types.js'
 
@@ -32,7 +32,8 @@ export function useNostrStore (
     ...nostrStore,
     ...useClient(nostrStore),
     ...useLogin(nostrStore),
-    ...useProfile(nostrStore)
+    ...useProfile(nostrStore),
+    ...useRoom(nostrStore)
     // signer : useSigner(nostrStore)
   }
 }

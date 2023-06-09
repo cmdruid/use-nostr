@@ -6,18 +6,15 @@ import { publishEvent } from '../lib/publish.js'
 import { Event, EventTemplate, Filter, SimplePool } from 'nostr-tools'
 
 export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
-  const { isConnected, pubkey, relays, signer } = store
+  const { pubkey, relays, signer } = store
   const pool = new SimplePool()
 
   useEffect(() => {
     if (relays.length > 0) {
-      update({ connection: 'conn' })
+      update({ client, connection: 'conn' })
       void connected().then(connected => {
         if (connected) {
-          update({
-            client,
-            connection: 'ok'
-          })
+          update({ connection: 'ok' })
         } else {
           update({
             connection : 'error',
@@ -28,7 +25,11 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     } else {
       update({ client: undefined, connection: 'none' })
     }
-  }, [ pubkey, relays ])
+  }, [ relays ])
+
+  useEffect(() => {
+    update({ client })
+  }, [ pubkey, signer ])
 
   async function connected () : Promise<boolean> {
     if (relays.length === 0) {
@@ -41,31 +42,27 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     })
   }
 
-  async function publish (event : Partial<EventTemplate>) : Promise<Event | undefined> {
-    if (!isConnected) {
-      setError('Not connected to a relay!')
-      return undefined
-    }
+  const client = {
+    connected,
+    publish,
+    pubkey,
+    get  : async (filter  : Filter)   => pool.get(relays, filter),
+    list : async (filters : Filter[]) => pool.list(relays, filters),
+    pub  : async (event   : Event)    => pool.publish(relays, event),
+    sub  : async (filters : Filter[]) => pool.sub(relays, filters)
+  }
 
+  async function publish (
+    event : Partial<EventTemplate>
+  ) : Promise<Event | undefined> {
     if (signer === undefined) {
-      setError('Signing method is not defined!')
-      return undefined
+      throw new Error('Signer is undefined!')
     }
-
     return publishEvent(client, event, signer)
       .catch(err => {
         setError(err as Error)
         return undefined
       })
-  }
-
-  const client = {
-    connected,
-    publish,
-    get  : async (filter  : Filter)   => pool.get(relays, filter),
-    list : async (filters : Filter[]) => pool.list(relays, filters),
-    pub  : async (event   : Event)    => pool.publish(relays, event),
-    sub  : async (filters : Filter[]) => pool.sub(relays, filters)
   }
 
   return { client }
