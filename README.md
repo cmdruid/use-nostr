@@ -8,6 +8,8 @@ This project is designed to be a turn-key library for using Nostr with React.
 - Uses a simple reducer `store` with `update` method.
 - Helper boolean, status and error messages for reactive components.
 
+**NEW**: Nostr rooms now available! Easily create group messaging using a shared secret!
+
 Coming soon:
   - Sign / verify custom messages and challenges using the Signer API.
   - Receive a Taproot HD wallet derived from your nostr signing device.
@@ -184,6 +186,74 @@ const { getProfile, setProfile } = useNostr()
 getProfile = () => Promise<Profile | undefined>
 // Update your profile using a partial JSON template.
 setprofile = (updates : Partial<Profile>) => Promise<void>
+```
+
+### Room API
+
+Rooms are a way to pass messages in real-time between a group of users. You can create or join a room using a secret string that is shared by all parties. All messages within the room are encrypted and covertly tagged using the shared secret.
+
+A room object works like a typical event emitter. You can broadcast a custom event to the room using `pub`, and listen for custom events using `on`, `once` or `within`. You can also emit events only to yourself using `emit`. Any callback methods registered to an event will receive a payload of data from the publisher, plus the event envelope it was wrapped in.
+
+```ts
+const { joinRoom } = useNostr()
+
+// Multiple parties can join a single room using a secret string.
+const room = joinRoom('secretstring')
+
+// You can publish any type of payload to any custom named event.
+room.pub('customevent', { hello: 'world!' })
+
+// You can attach a callback method to any custom event.
+room.on('customevent', (payload, envelope) => {
+  console.log(payload) // { hello: 'world!' }
+  // The envelope is the event object itself.
+  console.log(envelope.kind) // 21111 by default.
+})
+
+class NostrRoom {
+  cache     : Array<EventRecord> // A rolling cache of past events.
+  config    : RoomConfig  // Configuration for the room.
+  events    : Callbacks   // List of callbacks registered for each event label.
+  connected : boolean     // Returns true once the room has an active subscription.
+  members   : string[]    // A list of pubkeys that represent active participants.
+  roomId    : Buff        // The identifer used to tag each event (for filtering).
+  sharedKey : Buff        // The shared key used for encryption (computed from secret).
+
+  // Emit an event only to yourself. Useful for internal logic.
+  emit (eventName: string, ...args: any[]) => void
+  // Broadcast an event to everyone in the room.
+  pub (
+    eventName : string,
+    payload   : Json,
+    template ?: Partial<EventTemplate>
+  ) => Promise<Event | undefined>
+  // Register a callback method for a particular event.
+  on (eventName : string, fn : Function)   => void
+  // Register a callback that only executes once.
+  once (eventName : string, fn : Function) => void
+  // Register a callback that only exists for a limited time.
+  within (eventName : string, fn : Function, timeout: number) => void
+  // Remove a specific callback from the event list.
+  remove (eventName : string, fn : Function) => void
+  // Remove all callbacks registered to a specific event label.
+  prune(eventName: string) => void
+  // Unsubscribe the room from the relay pool.
+  leave() => void
+}
+
+type EventRecord = [ eventName: string, payload: any, envelope: Event ]
+type Callbacks   = Record<string, Set<Function>>
+
+interface RoomConfig {
+  cacheSize      : number      // Sets the number of past events to store in cache.
+  allowEcho      : boolean     // Toggles receipt of events that you published yourself.
+  encryption     : boolean     // Toggles encryption for event content.
+  expiration     : number      // Events are set to expire after the time period.
+  filter         : Filter      // Customize the filter used to subscribe to room events.
+  inactiveLimit ?: number      // Users in the room are marked inactive after the time period.
+  kind           : number      // Set which kind number to use for each event envelope.
+  tags           : string[][]  // Set custom tags to be added to each event envelope.
+}
 ```
 
 ### Signer API
