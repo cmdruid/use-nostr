@@ -13,6 +13,8 @@ This project is designed to be a turn-key library for using Nostr with React.
 Coming soon:
   - Sign / verify custom messages and challenges using the Signer API.
   - Receive a Taproot HD wallet derived from your nostr signing device.
+  - Better integration of user profile and relay list.
+  - Remote signing support.
 
 This project is fully typed and designed to work with intellisense.
 
@@ -207,8 +209,17 @@ room.pub('customevent', { hello: 'world!' })
 room.on('customevent', (payload, envelope) => {
   console.log(payload) // { hello: 'world!' }
   // The envelope is the event object itself.
-  console.log(envelope.kind) // 21111 by default.
-})
+  console.log(envelope)
+  /* {
+   *   "kind": 21111,
+   *   "tags": [ 
+   *     [ "h", "11ed64797736fdb7577bc10987e8b0a82210a93e90d39a217306e714504e97a4" ],
+   *     [ "expiration", "1772782615" ]
+   *   ],
+   *   "content": "6JArpHDMApqEY7dDuf_mo-KZHfMbZrZ6o6qJnXqxRuc8QzAWRz4zJ4kjzwCzM3Utf-_WeRJ-E59TCr3esj65gw?iv=MJjiOgQ7cGjAT5k6wWpHfg",
+   *   "created_at": 1686382615
+   * }
+   */
 
 class NostrRoom {
   cache     : Array<EventRecord> // A rolling cache of past events.
