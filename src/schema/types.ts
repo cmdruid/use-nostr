@@ -1,4 +1,5 @@
 import { Event, EventTemplate, Filter, Pub, Sub } from 'nostr-tools'
+import { StoreAPI } from '../hooks/useStore'
 
 export type Signer = (event : EventTemplate) => Promise<Event>
 
@@ -11,10 +12,15 @@ declare global {
   }
 }
 
+export interface NostrAPI extends StoreAPI<NostrStore> {
+  setError : (err : Error | string) => void
+}
+
 export interface Client {
   connected : () => Promise<boolean>
-  pubkey  : string | undefined
-  publish : (tempalte : Partial<EventTemplate>) => Promise<Event | undefined>
+  publish   : (tempalte : Partial<EventTemplate>) => Promise<Event | undefined>
+  pubkey    : string | undefined
+  ok   : boolean
   get  : (filter  : Filter)   => Promise<Event | null>
   list : (filters : Filter[]) => Promise<Event[]>
   pub  : (event   : Event)    => Promise<Pub>

@@ -1,17 +1,16 @@
 import { useEffect }    from 'react'
-import { StoreAPI }     from './useStore.js'
-import { NostrStore }   from '../schema/types.js'
+import { NostrAPI }     from '../schema/types.js'
 import { publishEvent } from '../lib/publish.js'
 
 import { Event, EventTemplate, Filter, SimplePool } from 'nostr-tools'
 
-export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
-  const { pubkey, relays, signer } = store
+export function useClient ({ store, setError, update } : NostrAPI) {
+  const { isConnected, pubkey, relays, signer } = store
   const pool = new SimplePool()
 
   useEffect(() => {
     if (relays.length > 0) {
-      update({ client, connection: 'conn' })
+      update({ connection: 'conn' })
       void connected().then(connected => {
         if (connected) {
           update({ connection: 'ok' })
@@ -29,7 +28,7 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
 
   useEffect(() => {
     update({ client })
-  }, [ pubkey, signer ])
+  }, [ isConnected, pubkey, signer ])
 
   async function connected () : Promise<boolean> {
     if (relays.length === 0) {
@@ -46,6 +45,7 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     connected,
     publish,
     pubkey,
+    ok   : isConnected,
     get  : async (filter  : Filter)   => pool.get(relays, filter),
     list : async (filters : Filter[]) => pool.list(relays, filters),
     pub  : async (event   : Event)    => pool.publish(relays, event),
@@ -56,13 +56,11 @@ export function useClient ({ store, setError, update } : StoreAPI<NostrStore>) {
     event : Partial<EventTemplate>
   ) : Promise<Event | undefined> {
     if (signer === undefined) {
-      throw new Error('Signer is undefined!')
+      setError('Signer is undefined!')
+      return
     }
     return publishEvent(client, event, signer)
-      .catch(err => {
-        setError(err as Error)
-        return undefined
-      })
+      .catch(err => { setError(err); return undefined })
   }
 
   return { client }

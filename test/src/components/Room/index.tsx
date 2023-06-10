@@ -3,32 +3,34 @@ import { useNostr }  from '../../../../src/index.js'
 import { NostrRoom } from '../../../../src/lib/room.js'
 
 export default function DemoRoom () : ReactElement {
-  const [ secret, setSecret   ] = useState('usenostr-demo')
-  const [ msg, setMsg ]     = useState('')
-  const [ room, setRoom ]   = useState<NostrRoom | undefined>()
-  const [ chat, setChat ]   = useState('')
+  const [ secret, setSecret ]   = useState('usenostr-demo')
+  const [ message, setMessage ] = useState('')
+  const [ room, setRoom ] = useState<NostrRoom>()
+  const [ chat, setChat ] = useState<string[]>([])
  
-  const { store, joinRoom } = useNostr()
+  const { joinRoom } = useNostr()
 
   function join () {
-    const rm = joinRoom(secret)
-    rm.on('msg', (message : string) => {
-      setChat(message)
+    const room = joinRoom(secret, { allowEcho: true })
+    room.on('msg', (message : string) => {
+      setChat((prev) => [ ...prev, message ])
     })
-    setRoom(rm)
+    setRoom(room)
   }
 
   function leave () {
-    room?.leave()
-    setRoom(undefined)
+    if (room !== undefined) {
+      room.leave()
+      setRoom(undefined)
+      setChat([])
+    }
   }
 
   function send () {
-    if (room === undefined) {
-      throw new Error('Room is undefined!')
+    if (room !== undefined) {
+      room.pub('msg', message)
     }
-    setMsg('')
-    room.pub('msg', msg)
+    setMessage('')
   }
 
   return (
@@ -48,12 +50,14 @@ export default function DemoRoom () : ReactElement {
           }
         </div>
         <div>
-          <pre>{room !== undefined && chat}</pre>
+          <div>
+            {chat.map(e => <pre key={e}>{e}</pre>)}
+          </div>
           <input
             type="text"
             placeholder='enter a message...'
-            value={msg}
-            onChange={ (e) => { setMsg(e.target.value) } }
+            value={message}
+            onChange={ (e) => { setMessage(e.target.value) } }
           />
           <button style={{ marginLeft: '0.5rem' }} onClick={send}>[ send ]</button>
         </div>

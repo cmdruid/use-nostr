@@ -5,11 +5,11 @@ import { useNostr }   from '../../../../src/index.js'
 const DEFAULT_FILTER = '{\n  "kinds": [ 1 ],\n  "limit": 10\n}'
 
 export default function Events () {
-  const { store, setError } = useNostr()
-  const [ sub, setSub ]   = useState<Sub | null>(null)
-  const [ events, setEvents ] = useState<Event[]>([])
+  const { store, setError }      = useNostr()
+  const [ sub, setSub ]          = useState<Sub>()
+  const [ events, setEvents ]    = useState<Event[]>([])
   const [ subFilter, setFilter ] = useState(DEFAULT_FILTER)
-  const [ isValid, setValid ] = useState(false)
+  const [ isValid, setValid ]    = useState(false)
 
   const valid   = '#00800040'
   const invalid = '#ff000040'
@@ -19,17 +19,11 @@ export default function Events () {
   }, [ subFilter])
 
   async function submit () {
-    const { client, connection } = store
-    if (
-      client !== undefined &&
-      connection === 'ok'  &&
-      isValid
-    ) {
-      if (sub !== null) {
-        sub.unsub()
-      }
+    const { client } = store
+
+    if (client?.ok) {
       const filter = JSON.parse(subFilter)
-      const newsub = await store.client?.sub([ filter ])
+      const newsub = await client.sub([ filter ])
 
       if (newsub === undefined) {
         setError('Failed to subscribe!')
@@ -37,11 +31,19 @@ export default function Events () {
       }
 
       newsub.on('event', (event) => {
-        setEvents([ ...events, event ])
+        setEvents((prev) => [ ...prev, event ])
       })
 
-      setSub(sub)
+      setSub(newsub)
     }   
+  }
+
+  function cancel () {
+    if (sub !== undefined) {
+      sub.unsub()
+      setSub(undefined)
+      setEvents([])
+    }
   }
 
   return (
@@ -52,10 +54,13 @@ export default function Events () {
         onChange={(e) => setFilter(e.target.value)}
         style={{backgroundColor : (isValid) ? valid : invalid }}
       ></textarea>
-      <button onClick={submit}>Subscribe</button>
+      {(sub !== undefined)
+        ? <button onClick={cancel}>Cancel</button>
+        : <button onClick={submit}>Subscribe</button>
+      }
       <div className='eventlist'>
         {events.map(e => {
-          return <pre key={e.id}>{JSON.stringify(e, null, 2)}</pre>
+          return <pre key={e.id}>{e.content}</pre>
         })}
       </div>
     </div>

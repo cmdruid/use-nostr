@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
-import { StoreAPI }  from './useStore.js'
 import { DEFAULT }   from '../schema/config.js'
-import { NostrStore, Profile } from '../schema/types.js'
+import { NostrAPI, Profile } from '../schema/types.js'
 
 import {
   getProfileEvent,
@@ -9,7 +8,7 @@ import {
 } from '../lib/profile.js'
 
 export function useProfile (
-  { store, setError, update } : StoreAPI<NostrStore>
+  { store, setError, update } : NostrAPI
 ) {
   const { client, isConnected, pubkey, profile, signer } = store
 
