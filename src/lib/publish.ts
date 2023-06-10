@@ -15,8 +15,6 @@ export async function publishEvent (
     created_at : now()
   })
 
-  console.log('signed:', signed)
-
   const pub = await client.pub(signed)
 
   let timer : NodeJS.Timeout
