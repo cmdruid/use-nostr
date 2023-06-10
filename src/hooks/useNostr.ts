@@ -1,17 +1,16 @@
-import { useEffect }       from 'react'
-import { useLogin }        from './useLogin.js'
-import { useProfile }      from './useProfile.js'
-import { useClient }       from './useClient.js'
-import { useRoom }         from './useRoom.js'
-import { Hooks, useStore } from './useStore.js'
-import { NostrStore }      from '../schema/types.js'
+import { useEffect }  from 'react'
+import { useLogin }   from './useLogin.js'
+import { useProfile } from './useProfile.js'
+import { useClient }  from './useClient.js'
+import { useRoom }    from './useRoom.js'
+import { useStore }   from './useStore.js'
+import { NostrStore } from '../schema/types.js'
 
 export function useNostrStore (
-  defaults : NostrStore,
-  hooks    : Hooks<NostrStore> = {}
+  defaults : NostrStore
 ) {
-  const nostrStore = useStore(defaults, hooks)
-  const { store, update } = nostrStore
+  const defaultStore = useStore(defaults)
+  const { store, update } = defaultStore
   const { client, connection } = store
 
   useEffect(() => {
@@ -27,6 +26,19 @@ export function useNostrStore (
       console.log('NostrStore:', store)
     }
   }, [ store ])
+
+  function setError (err : Error | string) {
+    if (err instanceof Error) {
+      const { message } = err
+      console.error(err)
+      update({ error: message })
+    } else {
+      console.error('Error:', err)
+      update({ error: err })
+    }
+  }
+
+  const nostrStore = { ...defaultStore, setError }
 
   return {
     ...nostrStore,

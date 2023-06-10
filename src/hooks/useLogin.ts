@@ -1,8 +1,7 @@
-import { useEffect }    from 'react'
-import { StoreAPI }     from './useStore.js'
-import { NostrStore }   from '../schema/types.js'
-import { sleep }        from '../lib/util.js'
-import { DEFAULT }      from '../schema/config.js'
+import { useEffect } from 'react'
+import { NostrAPI }  from '../schema/types.js'
+import { sleep }     from '../lib/util.js'
+import { DEFAULT }   from '../schema/config.js'
 
 import { getSecSigner, getExtSigner } from '../lib/signer.js'
 
@@ -18,7 +17,7 @@ const LOGOUT = {
   signer  : undefined
 }
 
-export function useLogin ({ store, setError, update } : StoreAPI<NostrStore>) {
+export function useLogin ({ store, setError, update } : NostrAPI) {
   useEffect(() => {
     // Update the 'hasExtension' value if an extension
     // is detected in the window object.

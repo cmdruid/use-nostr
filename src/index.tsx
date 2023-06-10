@@ -16,8 +16,7 @@ const context = createContext<NostrContext | null>(null)
 
 export function NostrProvider ({
   children,
-  defaults = {},
-  hooks    = {}
+  defaults = {}
 } : {
   children  : ReactElement | ReactElement[]
   defaults ?: Partial<typeof DEFAULT.store>
@@ -26,10 +25,7 @@ export function NostrProvider ({
 ) : ReactElement {
   // Returns the Provider that wraps our app and
   // passes down the context object.
-  const ctx = useNostrStore(
-    { ...DEFAULT.store, ...defaults },
-    { ...DEFAULT.hooks, ...hooks    }
-  )
+  const ctx = useNostrStore({ ...DEFAULT.store, ...defaults })
 
   return (
     <context.Provider value={ctx}>

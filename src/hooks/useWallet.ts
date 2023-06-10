@@ -1,7 +1,6 @@
-import { StoreAPI }   from './useStore.js'
-import { NostrStore } from '../schema/types.js'
+import { NostrAPI } from '../schema/types.js'
 
-export function useWallet ({ store, setError, update } : StoreAPI<NostrStore>) {
+export function useWallet ({ store, setError, update } : NostrAPI) {
   console.log(store, setError, update)
   // const { pubkey, signer } = store
 
@@ -20,23 +19,22 @@ export function useWallet ({ store, setError, update } : StoreAPI<NostrStore>) {
    * Nostr Wallet
    * - Sign event with top-domain in content (and maybe other commitments).
    * - Hash signed event, use as deterministic seed.
-   * - Create a 
    */
 
-  return {
-    scan,    // Scan the block-chain for UTXOs
-    balance, // Return our on-chain balance.
-    send,
-    recv,
-    sign,
-    verify,
-    import: {
-      fromWords : null,
-      fromSeed  : null
-    },
-    export: {
-      toWords : null,
-      toSeed  : null
-    }
-  }
+  // return {
+  //   scan,    // Scan the block-chain for UTXOs
+  //   balance, // Return our on-chain balance.
+  //   send,
+  //   recv,
+  //   sign,
+  //   verify,
+  //   import: {
+  //     fromWords : null,
+  //     fromSeed  : null
+  //   },
+  //   export: {
+  //     toWords : null,
+  //     toSeed  : null
+  //   }
+  // }
 }

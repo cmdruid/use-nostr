@@ -1,13 +1,14 @@
 import { Buff, Bytes, Json } from '@cmdcode/buff-utils'
-import { Event, EventTemplate, Filter, Sub, verifySignature } from 'nostr-tools'
+import { Event, EventTemplate, Filter, Sub } from 'nostr-tools'
 
 import { Client }    from '../schema/types.js'
 import { isExpired, now } from '../lib/util.js'
+import { SignedEvent } from './event.js'
 
 export interface RoomConfig {
   cacheSize      : number
-  echo           : boolean
-  encrypt        : boolean
+  allowEcho      : boolean
+  encryption     : boolean
   expiration     : number
   filter         : Filter
   inactiveLimit ?: number
@@ -17,8 +18,8 @@ export interface RoomConfig {
 
 const DEFAULTS = {
   cacheSize     : 100,
-  echo          : false,
-  encrypt       : true,
+  allowEcho     : false,
+  encryption    : true,
   expiration    : 1000 * 60 * 60 * 24,
   filter        : { since: now() },
   inactiveLimit : 1000 * 60 * 60,
@@ -71,14 +72,13 @@ export class NostrRoom {
     const { filter, kind } = this.config
     const { kinds = [] }   = filter
 
-    const client    = this.client
     const subFilter = {
       ...filter,
       kinds : [ ...kinds, kind  ],
       '#h'  : [ this.roomId.hex ]
     }
 
-    this._sub = await client.sub([ subFilter ])
+    this._sub = await this.client.sub([ subFilter ])
 
     this._sub.on('event', (event : Event) => {
       void this._eventHandler(event)
@@ -90,31 +90,13 @@ export class NostrRoom {
   }
 
   async _eventHandler (event : Event) {
-    const { echo } = this.config
-    const pubkey   = this.client.pubkey
-    const { tags } = event
-    const expires  = tags.find(e => e[0] === 'expiration')
+    const { allowEcho } = this.config
+    const pubkey = this.client.pubkey
+    const signed = new SignedEvent(event)
+    const echoed = !allowEcho && signed.isAuthor(pubkey ?? '')
 
-    if (
-      Array.isArray(expires) &&
-      parseInt(expires[1]) < now()
-    ) {
-      console.log('event is expired!')
-      return
-    }
-
-    if (
-      echo &&
-      pubkey !== undefined &&
-      event.pubkey === pubkey
-    ) {
-      return
-    }
-
-    if (!verifySignature(event)) {
-       // Verify that the signature is valid.
-      console.log('Bad signature!')
-      this.emit('_err', { msg: 'Bad signature!' })
+    if (echoed || signed.isExpired || !signed.isValid) {
+      console.log(echoed, signed.isExpired, !signed.isValid)
       return
     }
 
@@ -129,9 +111,6 @@ export class NostrRoom {
       // Zod validation should go here.
 
       const { eventName, payload } = JSON.parse(content)
-
-      // this.emit('debug: ' + JSON.stringify(decryptedContent, null, 2))
-      // this.debug('metaData: ' + JSON.stringify(metaData, null, 2))
 
       // Emit the event to our subscribed functions.
       this.cache.push([ eventName, payload, event ])
@@ -180,15 +159,14 @@ export class NostrRoom {
     if (!this.connected) {
       throw new Error('Not connected to room!')
     }
-
-    const { expiration, kind } = this.config
+    const { encryption, expiration, kind } = this.config
     const { tags: conf_tags }  = this.config
     const { tags: temp_tags = [], ...rest } = template
 
     try {
       let content = JSON.stringify({ eventName, payload })
 
-      if (this.config.encrypt) {
+      if (encryption) {
         checkCryptoLib()
         content = await encrypt(content, this.shareKey)
       }
@@ -202,8 +180,6 @@ export class NostrRoom {
 
       const envelope = { kind, ...rest, tags  }
       const draft    = { ...envelope, content }
-
-      console.log('draft:', draft)
 
       return await this.client.publish(draft)
     } catch (err) {
