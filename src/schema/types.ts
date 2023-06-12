@@ -1,5 +1,7 @@
 import { Event, EventTemplate, Filter, Pub, Sub } from 'nostr-tools'
 import { StoreAPI } from '../hooks/useStore'
+import { ReactElement } from 'react'
+import { NostrRoom } from '../lib/room'
 
 export type Signer = (event : EventTemplate) => Promise<Event>
 
@@ -37,6 +39,7 @@ export interface NostrStore {
   pubkey      ?: string
   profile     ?: Profile
   relays       : string[]
+  rooms        : NostrRoom[]
   signer      ?: Signer
 }
 
@@ -51,4 +54,9 @@ export interface Profile {
   lud06        ?: string | undefined
   lud16        ?: string | undefined
   nip05        ?: string | undefined
+}
+
+export interface ProviderProps {
+  children  : ReactElement | ReactElement[]
+  defaults ?: Partial<NostrStore>
 }

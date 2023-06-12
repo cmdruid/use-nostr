@@ -29,11 +29,11 @@ const DEFAULTS = {
 }
 
 export class NostrRoom {
-  readonly cache   : Array<[ eventName: string, payload: any, envelope : Event ]>
-  readonly client  : Client
-  readonly config  : RoomConfig
-  readonly events  : Record<string, Set<Function>>
-  readonly _secret : Buff
+  readonly cache  : Array<[ eventName: string, payload: any, envelope : Event ]>
+  readonly cipher : Buff
+  readonly client : Client
+  readonly config : RoomConfig
+  readonly events : Record<string, Set<Function>>
 
   connected : boolean
   _sub      ?: Sub
@@ -44,11 +44,11 @@ export class NostrRoom {
     config : Partial<RoomConfig> = {}
   ) {
     this.cache     = []
+    this.cipher    = Buff.str(secret).digest
     this.client    = client
     this.config    = { ...DEFAULTS, ...config }
     this.connected = false
     this.events    = {}
-    this._secret   = Buff.str(secret)
 
     void this._subscribe()
   }
@@ -61,12 +61,8 @@ export class NostrRoom {
     return cache.map(e => e[2].pubkey)
   }
 
-  get roomId () : Buff {
-    return this.shareKey.digest
-  }
-
-  get shareKey () : Buff {
-    return this._secret.digest
+  get id () : Buff {
+    return this.cipher.digest
   }
 
   async _subscribe () {
@@ -76,7 +72,7 @@ export class NostrRoom {
     const subFilter = {
       ...filter,
       kinds : [ ...kinds, kind  ],
-      '#h'  : [ this.roomId.hex ]
+      '#h'  : [ this.id.hex ]
     }
 
     this._sub = await this.client.sub([ subFilter ])
@@ -87,6 +83,7 @@ export class NostrRoom {
 
     this._sub.on('eose', () => {
       this.connected = true
+      this.emit('_connected', this)
     })
   }
 
@@ -105,7 +102,7 @@ export class NostrRoom {
 
     try {
       if (typeof content === 'string' && content.includes('?iv=')) {
-        content = await Cipher.decrypt(content, this.shareKey)
+        content = await Cipher.decrypt(content, this.cipher)
       }
 
       // Zod validation should go here.
@@ -121,7 +118,7 @@ export class NostrRoom {
 
       this.emit(eventName, payload, event)
     } catch (err) {
-      this.emit('err', err)
+      this.emit('_error', err)
     }
   }
 
@@ -167,13 +164,13 @@ export class NostrRoom {
       let content = JSON.stringify({ eventName, payload })
 
       if (encryption) {
-        content = await Cipher.encrypt(content, this.shareKey)
+        content = await Cipher.encrypt(content, this.cipher)
       }
 
       const tags = [
         ...conf_tags,
         ...temp_tags,
-        [ 'h', this.roomId.hex ],
+        [ 'h', this.id.hex ],
         [ 'expiration', String(now() + expiration) ]
       ]
 
@@ -183,6 +180,7 @@ export class NostrRoom {
       return await this.client.publish(draft)
     } catch (err) {
       console.error(err)
+      this.emit('_error', err)
       return undefined
     }
   }
@@ -226,5 +224,6 @@ export class NostrRoom {
   leave () {
     this._sub?.unsub()
     this.connected = false
+    this.emit('_leave', this.id)
   }
 }

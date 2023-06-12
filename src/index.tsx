@@ -5,7 +5,8 @@ import {
 } from 'react'
 
 import { useNostrStore } from './hooks/useNostr.js'
-import { DEFAULT } from './schema/config.js'
+import { DEFAULT }       from './schema/config.js'
+import { ProviderProps } from './schema/types.js'
 
 export * from './schema/types.js'
 
@@ -14,14 +15,8 @@ export type NostrContext = ReturnType<typeof useNostrStore>
 // Create our provider context.
 const context = createContext<NostrContext | null>(null)
 
-export function NostrProvider ({
-  children,
-  defaults = {}
-} : {
-  children  : ReactElement | ReactElement[]
-  defaults ?: Partial<typeof DEFAULT.store>
-  hooks    ?: Partial<typeof DEFAULT.hooks>
-}
+export function NostrProvider (
+  { children, defaults = {} } : ProviderProps
 ) : ReactElement {
   // Returns the Provider that wraps our app and
   // passes down the context object.

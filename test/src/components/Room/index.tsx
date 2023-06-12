@@ -8,14 +8,14 @@ export default function DemoRoom () : ReactElement {
   const [ room, setRoom ] = useState<NostrRoom>()
   const [ chat, setChat ] = useState<string[]>([])
  
-  const { joinRoom } = useNostr()
+  const { rooms } = useNostr()
 
   function join () {
-    const room = joinRoom(secret, { allowEcho: true })
-    room.on('msg', (message : string) => {
+    const rm = rooms.join(secret, { allowEcho: true })
+    rm.on('msg', (message : string) => {
       setChat((prev) => [ ...prev, message ])
     })
-    setRoom(room)
+    setRoom(rm)
   }
 
   function leave () {

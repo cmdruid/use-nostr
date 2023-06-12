@@ -2,12 +2,13 @@ import { NostrAPI } from '../schema/types.js'
 
 export function useWallet ({ store, setError, update } : NostrAPI) {
   console.log(store, setError, update)
+
   // const { pubkey, signer } = store
 
   // We need to scan addresses in order to determine our balance and utxo set.
   // We also need to know what derivation path to use for signing.
   // Other wallets accomplish this via brute-force lookup of addresses.
-  // There is a "gap limit" where past a certain amount of unused addresses,
+  // There is a "gap limit" where past a certain amount of unused addresses.
   // the wallet assumes you are at the tip.
   // If we include a 'topic' hash in our derivation path, we can reduce the
   // lookup space or eliminate it completely.

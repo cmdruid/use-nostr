@@ -222,6 +222,11 @@
   resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.7.4.tgz#f7c0f188f194dae8970ce4e96d05ba9d09c86744"
   integrity sha512-K/1Bo+VLZcJYghMZOXTxe2oD+lzzx2j5kk6kaoOUkPS2NLj3qylgVJZWtuS8NF6c96rtamgf3WBPUSit57Fh0w==
 
+"@cmdcode/keylink@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@cmdcode/keylink/-/keylink-1.4.2.tgz#f0c4c5417076294f248e4483cdcbf0eddaea366c"
+  integrity sha512-XQ1dcHQLk75IWheWkCXGrBvz81fUWtWOcVomaBwBtfMoOiG8E0hWN02C9gGtXT06MICZs1C8VCjsAheH1gH0RQ==
+
 "@esbuild/android-arm64@0.17.19":
   version "0.17.19"
   resolved "https://registry.yarnpkg.com/@esbuild/android-arm64/-/android-arm64-0.17.19.tgz#bafb75234a5d3d1b690e7c2956a599345e84a2fd"

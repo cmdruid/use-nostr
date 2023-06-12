@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@cmdcode/buff-utils": "^1.7.4",
+    "@cmdcode/keylink": "^1.4.2",
     "nostr-tools": "^1.10.1"
   },
   "peerDependencies": {
